@@ -1,9 +1,7 @@
 import java.security.*;
-import java.util.*;
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileInputStream;
-import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.IOException;
@@ -33,17 +31,17 @@ public class Assignment1{
     }
 
     // Code I used to check to see if encryption was successful
-    /* public static String decryption(SecretKeySpec key, IvParameterSpec initVector, byte[] encrypted) throws GeneralSecurityException {
-            Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
-            cipher.init(Cipher.DECRYPT_MODE, key, initVector);
-            byte[] original = cipher.doFinal(encrypted);
-            return new String(original, Charset.forName("UTF-8"));
-    } */
+    /*public static String decryption(SecretKeySpec key, IvParameterSpec initVector, byte[] encrypted) throws GeneralSecurityException {
+        Cipher cipher = Cipher.getInstance("AES/CBC/NoPadding");
+        cipher.init(Cipher.DECRYPT_MODE, key, initVector);
+        byte[] original = cipher.doFinal(encrypted);
+        return new String(original, Charset.forName("UTF-8"));
+    }*/
      
     public static void main(String[] args) {
         String file = (args[0]);
 
-        // My Private Key [used for both ]
+        // My Private Key
         BigInteger privKey = new BigInteger(1023, new SecureRandom());
         
         // Recipients Public Key in Big Integer form [used for shared Key generation]
@@ -62,10 +60,10 @@ public class Assignment1{
         BigInteger sharedKey = ltrmodoExpo(pubKey, privKey, pModBI);
 
         try {
-            // Create AES key using sharedKey in byteArray form.
+            // Create AES key using the sharedKey in byteArray form.
             MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
             byte[] byteArray = messageDigest.digest(sharedKey.toByteArray());
-            SecretKeySpec prKey = new SecretKeySpec(byteArray, "AES");
+            SecretKeySpec prKey = new SecretKeySpec(byteArray, "AES"); // Uses a 
             SecretKey key = prKey;
 
             // create the 128-bit IV in hex
@@ -87,21 +85,21 @@ public class Assignment1{
             fInputStream.read(fileBytes);
             fInputStream.close();
 
-            // padding input
+            // padding input to 128 bytes
             fileBytes[lengthIn] = (byte) 128;
             for(int i = 1; i < lengthPad; i++){
                 fileBytes[lengthIn + 1] = (byte) 0;
             }
 
-            // encrypt the padding input
+            // encrypt the padded file input
             byte[] finalOut = cr.doFinal(fileBytes);
 
-            // write the encrypted data to file
+            // write the encrypted data to specific file
             File outputF = new File("Encryption.txt");
             FileOutputStream fileOut = new FileOutputStream(outputF);
             fileOut.write(finalOut);
             fileOut.close();
-            System.out.println("Encryption Completed");
+            //System.out.println("Encryption Completed");
 
             // printing byte array as hex based on code seen here
             // https://stackoverflow.com/questions/9655181/how-to-convert-a-byte-array-to-a-hex-string-in-java
